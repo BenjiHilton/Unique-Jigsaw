@@ -37,94 +37,63 @@ pieces = [#top, right, bot, left (clockwise)
          Piece(0,0,-1,1) #6    
          ]
 
-pieceStock = pieces #pieces we remove while running
-
 #temporary array for storing board configurations while solving
 tempConfig = []
 
 solves = [] #finalized solves
 
-removedPieces = [] #stores the removed pieces in order
-
-
-
 #should iterate through a picked piece and all its rotations
-def BoardConfigs():
+def BoardConfigs(pieceStock):
     
-###########################################################################
-    if Piece.Sum != 0:
-        return print('This combination of jigsaws has no solution')
-###########################################################################
     for piece in pieceStock:
         print("once through this loop")
         for rotatedPiece in piece.RotatedVersions():
-            LegalPosition(rotatedPiece, piece)
-       
-        try:
-            rotatedPiece.append(removedPieces.pop(-1)) # adds the previously removed piece
-        except IndexError:
-            None 
+            LegalPosition(rotatedPiece, piece, pieceStock)
+        tempConfig.pop()
 
 #check if this position is legal if it is continue searching through BoardConfigs
-def LegalPosition(testPiece, originPiece):
+def LegalPosition(testPiece, originPiece, pieceStock):
     print("WOWOWO")
     if len(tempConfig) == 0:
         if testPiece.top == testPiece.left == 0:
             tempConfig.append(testPiece) #if it is a legal move add it to board
-            removedPieces.append(originPiece)
-            originPiece = "used"
-            BoardConfigs()
+            pieceStock.remove(originPiece) #removes item from list
+            BoardConfigs(pieceStock) #calls function with now new shortened list
     elif len(tempConfig) == 1:
         if testPiece.top == testPiece.right == 0 and -tempConfig[0].right == testPiece.left:
             tempConfig.append(testPiece) #if it is a legal move add it to board
-            removedPieces.append(originPiece)
-            originPiece = "used"
-            BoardConfigs()
+            pieceStock.remove(originPiece) #removes item from list
+            BoardConfigs(pieceStock) #calls function with now new shortened list
     elif len(tempConfig) == 2:
         if testPiece.left == testPiece.bot == 0 and -tempConfig[0].bot == testPiece.top:
             tempConfig.append(testPiece) #if it is a legal move add it to board
-            removedPieces.append(originPiece)
-            originPiece = "used"
-            BoardConfigs()
+            pieceStock.remove(originPiece) #removes item from list
+            BoardConfigs(pieceStock) #calls function with now new shortened list
     elif len(tempConfig) == 3:
         if testPiece.bot == testPiece.right == 0 and -tempConfig[1].bot == testPiece.top and -tempConfig[2].right == testPiece.left:
             tempConfig.append(testPiece) #if it is a legal move add it to board
-            #SaveSolve()
+            SaveSolve() #temp save solve where it just prints
     else:
         print("piece doesnt fit")
 
-#BoardConfigs()
-
-for piece in tempConfig:
-    print(piece.top)
-    print(piece.right)
-    print(piece.bot)
-    print(piece.left)
-    print(" ")
-
+def SaveSolve():
+    for piece in tempConfig:
+        print(piece.top)
+        print(piece.right)
+        print(piece.bot)
+        print(piece.left)
+        print(" ")
 
 
-#we cant delete an elemen while running for elemen in list - we need to change the value instead
-test = [1,2,3,4]
-for element in test:
-    print(element)
-    if element == 1:
-        #test.pop(0)
-        test[0] = 'used'
-#print(test)
 
+def FindPossiblePieceCombinations():
+    for pieceCombo in itertools.combinations(pieces, 4):
+        sum = 0
+        for piece in pieceCombo:
+            sum += piece.Sum()
+        if sum == 0
+            BoardConfigs(pieceCombo)
 
-#stuff = [1, 2, 3, 4, 5]
-#for L in range(0, len(stuff)+1):
-#    for subset in itertools.combinations(stuff, 4):
-#        print(subset)
-
-def returnAllPieceCombos():
-    for i in range(len(pieces)):
-        for pieceCombo in itertools.combinations(pieces, 4):
-            print(pieceCombo)
-
-returnAllPieceCombos()
 
 
 
