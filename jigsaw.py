@@ -1,3 +1,5 @@
+import itertools #combinations
+
 class Piece(): #Class for each jigsaw puzzle piece
     def __init__(self,t,r,b,l): #initilize it with the four values for each edges indentation
         self.top = t
@@ -48,12 +50,20 @@ removedPieces = [] #stores the removed pieces in order
 
 #should iterate through a picked piece and all its rotations
 def BoardConfigs():
+    
+###########################################################################
+    if Piece.Sum != 0:
+        return print('This combination of jigsaws has no solution')
+###########################################################################
     for piece in pieceStock:
         print("once through this loop")
         for rotatedPiece in piece.RotatedVersions():
             LegalPosition(rotatedPiece, piece)
-        
-        #add the removed piece back in
+       
+        try:
+            rotatedPiece.append(removedPieces.pop(-1)) # adds the previously removed piece
+        except IndexError:
+            None 
 
 #check if this position is legal if it is continue searching through BoardConfigs
 def LegalPosition(testPiece, originPiece):
@@ -100,11 +110,21 @@ for element in test:
     print(element)
     if element == 1:
         #test.pop(0)
-        test[0] = used
-print(test)
+        test[0] = 'used'
+#print(test)
 
 
+#stuff = [1, 2, 3, 4, 5]
+#for L in range(0, len(stuff)+1):
+#    for subset in itertools.combinations(stuff, 4):
+#        print(subset)
 
+def returnAllPieceCombos():
+    for i in range(len(pieces)):
+        for pieceCombo in itertools.combinations(pieces, 4):
+            print(pieceCombo)
+
+returnAllPieceCombos()
 
 
 
