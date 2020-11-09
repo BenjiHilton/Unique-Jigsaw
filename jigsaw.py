@@ -6,6 +6,7 @@ class Piece(): #Class for each jigsaw puzzle piece
         self.right = r
         self.bot = b
         self.left = l
+        self.position = None
 
     def Rotate(self,turns): #rotate the piece specified amount
         if turns == 1:
@@ -26,8 +27,9 @@ class Piece(): #Class for each jigsaw puzzle piece
     def Sum(self):
         return (self.top + self.right + self.bot + self.left)
 
+
 #define each of the 7 possible pieces for a 2x2 jigsaw puzzle
-pieces = [#top, right, bot, left (clockwise)
+allPossiblePieces = [#top, right, bot, left (clockwise)
          Piece(0,0,0,0), #0
          Piece(0,0,0,1), #1
          Piece(0,0,0,-1), #2
@@ -37,72 +39,84 @@ pieces = [#top, right, bot, left (clockwise)
          Piece(0,0,-1,1) #6    
          ]
 
-#temporary array for storing board configurations while solving
-tempConfig = []
-
 solves = [] #finalized solves
 
-#should iterate through a picked piece and all its rotations
-def BoardConfigs(pieceStock):
-    
+usedPieces = [] #keeping working config of board
+
+removedPieces = [] #keeps track of removed pieces
+
+def IteratePieceCombos():
+    for pieceCombo in itertools.combinations(allPossiblePieces, 4):
+        if PossiblePieceCombo(pieceCombo) == True:
+            print("###############################")
+            print("############***TRYING NEW PIECE COMBO***########")
+            print("###############################")
+            for piece in pieceCombo:
+                piece.position = pieceCombo.index(piece)
+            CreateBoardConfig(pieceCombo)
+
+def PossiblePieceCombo(pieces):
+    sum = 0
+    for piece in pieces:
+        sum += piece.Sum()
+    return True if sum == 0 else False
+
+def CreateBoardConfig(pieceStock):
     for piece in pieceStock:
-        print("once through this loop")
-        for rotatedPiece in piece.RotatedVersions():
-            LegalPosition(rotatedPiece, piece, pieceStock)
-        tempConfig.pop()
 
-#check if this position is legal if it is continue searching through BoardConfigs
-def LegalPosition(testPiece, originPiece, pieceStock):
-    print("WOWOWO")
-    if len(tempConfig) == 0:
-        if testPiece.top == testPiece.left == 0:
-            tempConfig.append(testPiece) #if it is a legal move add it to board
-            pieceStock.remove(originPiece) #removes item from list
-            BoardConfigs(pieceStock) #calls function with now new shortened list
-    elif len(tempConfig) == 1:
-        if testPiece.top == testPiece.right == 0 and -tempConfig[0].right == testPiece.left:
-            tempConfig.append(testPiece) #if it is a legal move add it to board
-            pieceStock.remove(originPiece) #removes item from list
-            BoardConfigs(pieceStock) #calls function with now new shortened list
-    elif len(tempConfig) == 2:
-        if testPiece.left == testPiece.bot == 0 and -tempConfig[0].bot == testPiece.top:
-            tempConfig.append(testPiece) #if it is a legal move add it to board
-            pieceStock.remove(originPiece) #removes item from list
-            BoardConfigs(pieceStock) #calls function with now new shortened list
-    elif len(tempConfig) == 3:
-        if testPiece.bot == testPiece.right == 0 and -tempConfig[1].bot == testPiece.top and -tempConfig[2].right == testPiece.left:
-            tempConfig.append(testPiece) #if it is a legal move add it to board
-            SaveSolve() #temp save solve where it just prints
+        #print("TESTET PIECE POSITION: " + str(piece.position))
+        if piece.position > -1:
+            #print("TRYING THE PIECE")
+            for rotatedPiece in piece.RotatedVersions():
+                if(PlaceablePiece(rotatedPiece)):
+                    removedPieces.append(piece)
+                    usedPieces.append(rotatedPiece)
+                    piece.position = -piece.position - 1
+                    #print("USED PIECE POSITION: " + str(piece.position))
+                    #print("###############################:  " +str(len(usedPieces)))
+                    if(len(usedPieces) < 4):
+                        #print("ENTERED RECURSION")
+                        CreateBoardConfig(pieceStock)
+                    else:
+                        SaveSolve(usedPieces)
+                        removedPiece = removedPieces.pop(-1)
+                        removedPiece.position = -removedPiece.position - 1
+                        usedPieces.pop(-1)    
+    #print("DEAD END - GOING BACK UP ON TREE")
+    if(removedPieces != []):
+        removedPiece = removedPieces.pop(-1)
+        removedPiece.position = -removedPiece.position - 1
+        usedPieces.pop(-1)
+        #print("ADDED BACK PIECE POSITION: " + str(removedPiece.position))
+
+
+def PlaceablePiece(tryPiece):
+    if ((len(usedPieces) == 0 and tryPiece.top == tryPiece.left == 0)
+    or (len(usedPieces) == 1 and tryPiece.top == tryPiece.right == 0 and -usedPieces[0].right == tryPiece.left)
+    or (len(usedPieces) == 2 and tryPiece.left == tryPiece.bot == 0 and -usedPieces[0].bot == tryPiece.top)
+    or (len(usedPieces) == 3 and tryPiece.bot == tryPiece.right == 0 and -usedPieces[1].bot == tryPiece.top and -usedPieces[2].right == tryPiece.left)):
+        return True
     else:
-        print("piece doesnt fit")
+        #print("ROTATED PIECE DIDNT FIT")
+        return False
 
-def SaveSolve():
-    for piece in tempConfig:
-        print(piece.top)
-        print(piece.right)
-        print(piece.bot)
-        print(piece.left)
-        print(" ")
+def SaveSolve(solution):
+    print("##########***SOLUTION***############")
+    # for piece in solution:
+    #     print(piece.top)
+    #     print(piece.right)
+    #     print(piece.bot)
+    #     print(piece.left)
+    print("###############################")
 
+IteratePieceCombos()
 
+# TESTPIECES = [Piece(0,0,1,1), #3
+#          Piece(0,0,-1,-1), #4
+#          Piece(0,0,1,-1), #5
+#          Piece(0,0,-1,1) #6
+# ]
 
-def FindPossiblePieceCombinations():
-    for pieceCombo in itertools.combinations(pieces, 4):
-        sum = 0
-        for piece in pieceCombo:
-            sum += piece.Sum()
-        if sum == 0
-            BoardConfigs(pieceCombo)
-
-
-
-
-
-
-
-
-
-
-
-
-
+# for piece in TESTPIECES:
+#     piece.position = TESTPIECES.index(piece)
+# CreateBoardConfig(TESTPIECES)
