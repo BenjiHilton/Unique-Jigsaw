@@ -48,9 +48,7 @@ removedPieces = [] #keeps track of removed pieces
 def IteratePieceCombos():
     for pieceCombo in itertools.combinations(allPossiblePieces, 4):
         if PossiblePieceCombo(pieceCombo) == True:
-            print("###############################")
             print("############***TRYING NEW PIECE COMBO***########")
-            print("###############################")
             for piece in pieceCombo:
                 piece.position = pieceCombo.index(piece)
             CreateBoardConfig(pieceCombo)
@@ -102,13 +100,12 @@ def PlaceablePiece(tryPiece):
 
 def SaveSolve(solution):
     print("##########***SOLUTION***############")
-    # for piece in solution:
-    #     print(piece.top)
-    #     print(piece.right)
-    #     print(piece.bot)
-    #     print(piece.left)
-    print("###############################")
-
+    for piece in solution:
+        print(piece.top)
+        print(piece.right)
+        print(piece.bot)
+        print(piece.left)
+        print("x")
 IteratePieceCombos()
 
 # TESTPIECES = [Piece(0,0,1,1), #3
