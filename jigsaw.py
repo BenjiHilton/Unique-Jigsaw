@@ -1,6 +1,6 @@
-import itertools #combinations
+import itertools #library for getting subarrays of arrays - combinations
 
-class Piece(): #Class for each jigsaw puzzle piece
+class Piece(): #A jigsaw puzzle piece class
     def __init__(self,t,r,b,l): #initilize it with the four values for each edges indentation
         self.top = t
         self.right = r
