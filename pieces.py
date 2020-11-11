@@ -1,7 +1,7 @@
-from piece_class import Piece
-from jigsaw import IteratePieceCombinations
+from piece_class import Piece                   #class defining each jigsaw piece used in puzzle
+from jigsaw import IteratePieceCombinations     #function that iterates through the pieces and finds solutions
 
-def GetPieces(): #Returns all pieces for specific puzzle
+def GetPieces(): #TEMP: returns all pieces for 2x2 jigsaw - GOAL: returns all pieces for specific puzzle
     return [ #top, right, bot, left (clockwise)
             Piece(0,0,0,0), #0
             Piece(0,0,0,1), #1
